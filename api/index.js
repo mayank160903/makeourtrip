@@ -28,9 +28,11 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 app.use(
   cors({
     credentials: true,
-    origin: "https://letsmakeourtrip.vercel.app/",
+    origin: "http://localhost:5173/",
   })
 );
+
+// https://letsmakeourtrip.vercel.app/
 
 
 async function uploadToS3(path, originalFileName, mimetype) {

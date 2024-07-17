@@ -4,13 +4,14 @@ import { Link } from 'react-router-dom';
 import Image from './Image';
 
 const Indexpage = () => {
+  const apiUrl = "https://makeourtripbackend.onrender.com"
   const [places, setPlaces] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('');
   const [priceRange, setPriceRange] = useState([100, 10000]);
 
   useEffect(() => {
-    axios.get('/places').then((response) => {
+    axios.get(`${apiUrl}/places`).then((response) => {
       setPlaces(response.data);
     });
   }, []);
