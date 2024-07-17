@@ -11,7 +11,7 @@ const Indexpage = () => {
   const [priceRange, setPriceRange] = useState([100, 10000]);
 
   useEffect(() => {
-    axios.get(`${apiUrl}/places`).then((response) => {
+    axios.get(`/places`).then((response) => {
       setPlaces(response.data);
     });
   }, []);

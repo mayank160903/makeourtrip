@@ -32,7 +32,6 @@ app.use(
   })
 );
 
-// https://letsmakeourtrip.vercel.app/
 
 
 async function uploadToS3(path, originalFileName, mimetype) {
