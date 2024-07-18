@@ -63,6 +63,7 @@ function getUserDataFromReq(req) {
     return new Promise((resolve, reject) => {
     //   const token = req.cookies.token;
     const token = req.headers['authorization'] || req.query.token || req.body.token;
+    console.log(token);
       if (!token) {
         return reject(new Error('Token not provided'));
       }
@@ -196,7 +197,7 @@ app.get("/profile", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
-  console.log({token});
+//   console.log({token});
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
       if (err) throw err;
@@ -263,7 +264,7 @@ app.post("/places", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
-  console.log({token});
+//   console.log({token});
   const {
     title,
     address,
