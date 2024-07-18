@@ -418,6 +418,9 @@ app.get('/bookings', async (req, res) => {
             //   const token = req.cookies.token;
             // await req.headers['authorization'] || req.query.token || req.body.token;
         const userData = req.cookies.token;
+        if(!userData){
+            res.json("No token bruh");
+        }
         const bookings = await Booking.find({ user: userData.id }).populate('place');
         if(bookings){
             res.json(bookings);
