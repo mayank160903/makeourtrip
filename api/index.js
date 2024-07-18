@@ -411,22 +411,42 @@ app.post("/bookings", async (req, res) => {
 
 
 
+// app.get('/bookings', async (req, res) => {
+//     mongoose.connect(process.env.MONGO_URL);
+
+//     try {
+//             //   const token = req.cookies.token;
+//             // await req.headers['authorization'] || req.query.token || req.body.token;
+//         const token = req.cookies?.token;
+//         if(!token){
+//             res.json("No token bruh");
+//         }
+//         const bookings = await Booking.find({ user: token.id }).populate('place');
+//         res.json(bookings);
+//     } catch (error) {
+//         res.status(400).json({ error: error.message });
+//     }
+// });
+
 app.get('/bookings', async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
     try {
-            //   const token = req.cookies.token;
-            // await req.headers['authorization'] || req.query.token || req.body.token;
         const token = req.cookies?.token;
-        if(!token){
-            res.json("No token bruh");
+        if (!token) {
+            return res.json("No token bruh");
         }
-        const bookings = await Booking.find({ user: token.id }).populate('place');
+
+        const userData = jwt.verify(token, jwtSecret);
+        const bookings = await Booking.find({ user: userData.id }).populate('place');
+
         res.json(bookings);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
 });
+
+
 
 app.listen(4000);
 
