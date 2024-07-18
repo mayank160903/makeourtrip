@@ -15,7 +15,7 @@ import BookingPage from "./Pages/BookingPage"
 import EditProfile from "./Pages/EditProfile"
 
 axios.defaults.baseURL = "https://makeourtripbackend.onrender.com"
-axios.defaults.withCredentials = true;
+// axios.defaults.withCredentials = true;
 
 function App() {
   
