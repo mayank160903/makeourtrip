@@ -41,6 +41,14 @@ app.options('*', cors({
     credentials: true
 })); 
 
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://makeourtrip-rho.vercel.app');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    next();
+});
+
 
 
 async function uploadToS3(path, originalFileName, mimetype) {
@@ -410,7 +418,12 @@ app.get('/bookings', async (req, res) => {
     try {
         const userData = await getUserDataFromReq(req);
         const bookings = await Booking.find({ user: userData.id }).populate('place');
-        res.json(bookings);
+        if(bookings){
+            res.json(bookings);
+        }
+        else{
+            res.json("Create one!");
+        }
     } catch (error) {
         res.status(400).json({ error: error.message });
     }
