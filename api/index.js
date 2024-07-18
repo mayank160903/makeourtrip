@@ -61,7 +61,8 @@ async function uploadToS3(path, originalFileName, mimetype) {
 
 function getUserDataFromReq(req) {
     return new Promise((resolve, reject) => {
-      const token = req.cookies.token;
+    //   const token = req.cookies.token;
+    const token = req.headers['authorization'] || req.query.token || req.body.token;
       if (!token) {
         return reject(new Error('Token not provided'));
       }
