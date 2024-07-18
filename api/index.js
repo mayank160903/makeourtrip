@@ -417,7 +417,7 @@ app.get('/bookings', async (req, res) => {
     try {
             //   const token = req.cookies.token;
             // await req.headers['authorization'] || req.query.token || req.body.token;
-        const userData = req.cookies.token;
+        const {userData} = req.cookies.token;
         if(!userData){
             res.json("No token bruh");
         }
