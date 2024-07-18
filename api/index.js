@@ -31,10 +31,15 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 
 app.use(
   cors({
-    // credentials: true,
+    credentials: true,
     origin: "https://makeourtrip-rho.vercel.app",
   })
 );
+
+app.options('*', cors({
+    origin: 'https://makeourtrip-rho.vercel.app',
+    credentials: true
+})); 
 
 
 
@@ -402,9 +407,14 @@ app.post("/bookings", async (req, res) => {
 app.get('/bookings', async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
-    const userData = await getUserDataFromReq(req);
-    res.json(await Booking.find({user: userData.id}).populate('place'));
-})
+    try {
+        const userData = await getUserDataFromReq(req);
+        const bookings = await Booking.find({ user: userData.id }).populate('place');
+        res.json(bookings);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
+});
 
 app.listen(4000);
 
