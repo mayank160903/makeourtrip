@@ -7,14 +7,18 @@ const cookieParser = require("cookie-parser");
 const imageDownloader = require("image-downloader");
 const fs = require("fs");
 const mime = require('mime-types');
+const multer = require("multer");
+const nodemailer = require('nodemailer');
+
+const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
+
 const UserModel = require("./models/User");
 const Place = require("./models/Place");
 const Booking = require("./models/Booking");
-const nodemailer = require('nodemailer');
-const {S3Client, PutObjectCommand} = require('@aws-sdk/client-s3');
-const multer = require("multer");
+
 require("dotenv").config();
 const app = express();
+
 
 const bcryptSalt = bcrypt.genSaltSync(10);
 const jwtSecret = "oiuytrdxcvbnjkiuytrews";
@@ -55,16 +59,21 @@ async function uploadToS3(path, originalFileName, mimetype) {
     return `https://${bucket}.s3.amazonaws.com/${newFileName}`
 }
 
-function getUserDataFromReq(req){
-    return new Promise((resolve, reject)=> {
-        jwt.verify(req.cookies.token, jwtSecret, {} , async (err, userData) => {
-            if(err) throw err;
-            resolve(userData);
-        });
-    })
-    
-}
-
+function getUserDataFromReq(req) {
+    return new Promise((resolve, reject) => {
+      const token = req.cookies.token;
+      if (!token) {
+        return reject(new Error('Token not provided'));
+      }
+      jwt.verify(token, jwtSecret, {}, (err, userData) => {
+        if (err) {
+          return reject(err);
+        }
+        resolve(userData);
+      });
+    });
+  }
+  
 app.get("/test", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
@@ -169,10 +178,25 @@ app.post("/login", async (req, res) => {
   }
 });
 
+// {
+//     "title": "New Place",
+//     "address": "Grove Street",
+//     "addedPhotos": [],
+//     "description" : "what a place wow man",
+//     "perks": [],
+//     "addLink": "Link to location",
+//     "extraInfo": "None man",
+//     "checkIn": 12,
+//     "checkOut": 11,
+//     "maxGuests": 10,
+//     "price": 100
+// }
+
 app.get("/profile", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
+  console.log({token});
   if (token) {
     jwt.verify(token, jwtSecret, {}, async (err, userData) => {
       if (err) throw err;
@@ -228,10 +252,18 @@ app.post("/upload", photosMiddleware.array('photos', 100) ,async (req, res) => {
   res.json(uploadedFiles);
 });
 
+//app.post "/places"
+//app.get "/user-places"
+//app.get "/places/:id"
+//app.put "/places"
+//app.post "/bookings"
+//app.get "/bookings"
+
 app.post("/places", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
+  console.log({token});
   const {
     title,
     address,
@@ -376,3 +408,5 @@ app.get('/bookings', async (req, res) => {
 app.listen(4000);
 
 //db pass : SYoY5XjLLDth7eQa
+
+

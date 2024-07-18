@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom';
 import Image from './Image';
 
 const Indexpage = () => {
-  const apiUrl = "https://makeourtripbackend.onrender.com"
   const [places, setPlaces] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOrder, setSortOrder] = useState('');
