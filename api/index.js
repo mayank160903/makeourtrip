@@ -28,29 +28,26 @@ app.use(express.json());
 app.use(cookieParser());
 app.use("/uploads", express.static(__dirname + "/uploads"));
 
-app.use(cors());
 
-// app.use(
-//   cors(
-//     {
-//     credentials: true,
-//     origin: "https://makeourtrip-rho.vercel.app",
-//   }
-// )
-// );
+app.use(
+  cors({
+    credentials: true,
+    origin: "https://makeourtrip-rho.vercel.app",
+  })
+);
 
-// app.options('*', cors({
-//     origin: 'https://makeourtrip-rho.vercel.app',
-//     credentials: true
-// })); 
+app.options('*', cors({
+    origin: 'https://makeourtrip-rho.vercel.app',
+    credentials: true
+})); 
 
-// app.use((req, res, next) => {
-//     res.header('Access-Control-Allow-Origin', 'https://makeourtrip-rho.vercel.app');
-//     res.header('Access-Control-Allow-Credentials', 'true');
-//     res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
-//     res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
-//     next();
-// });
+app.use((req, res, next) => {
+    res.header('Access-Control-Allow-Origin', 'https://makeourtrip-rho.vercel.app');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Allow-Methods', 'GET,HEAD,PUT,PATCH,POST,DELETE');
+    res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+    next();
+});
 
 
 

@@ -24,7 +24,7 @@ const PlacesForm = () => {
     if(!id){
         return;
     }
-    axios.get('/places/'+id)
+    axios.get(`/places/${id}`)
     .then(response => {
         const {data} = response;
         setTitle(data.title);
@@ -76,7 +76,7 @@ const PlacesForm = () => {
 
     }
     if(id){
-        await axios.put("/places", {
+        await axios.put(`/places`, {
             id,
             ...placeData
             
@@ -84,7 +84,7 @@ const PlacesForm = () => {
           setRedirect(true);
     }
     else{
-        await axios.post("/places", placeData);
+        await axios.post(`/places`, placeData);
           setRedirect(true);
     }
     

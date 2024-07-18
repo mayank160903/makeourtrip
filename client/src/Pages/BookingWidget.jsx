@@ -25,7 +25,7 @@ const BookingWidget = ({ place }) => {
   }
 
   async function bookThisPlace() {
-    const response = await axios.post('/bookings', 
+    const response = await axios.post(`/bookings`, 
         {
             checkIn, checkOut, numberOfGuests, numberOfNights, name, phone,
             place: place._id,
