@@ -390,7 +390,7 @@ app.get("/places", async (req, res) => {
 app.post("/bookings", async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
-    const userData = await getUserDataFromReq(req);
+    const userData = await req.cookies?.token;
   const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
     req.body;
   Booking.create({
@@ -417,17 +417,12 @@ app.get('/bookings', async (req, res) => {
     try {
             //   const token = req.cookies.token;
             // await req.headers['authorization'] || req.query.token || req.body.token;
-        const userData = req.cookies.token;
-        if(!userData){
+        const token = req.cookies?.token;
+        if(!token){
             res.json("No token bruh");
         }
-        const bookings = await Booking.find({ user: userData.id }).populate('place');
-        if(bookings){
-            res.json(bookings);
-        }
-        else{
-            res.json("Create one!");
-        }
+        const bookings = await Booking.find({ user: token.id }).populate('place');
+        res.json(bookings);
     } catch (error) {
         res.status(400).json({ error: error.message });
     }

@@ -9,8 +9,17 @@ const BookingsPage = () => {
   const [bookings, setBookings] = useState([]);
   useEffect(() => {
     axios.get(`/bookings`).then((response) => {
-      setBookings(response.data);
-    });
+        if(Array.isArray(response.data)){
+            setBookings(response.data);
+        }
+        else{
+            setBookings([]);
+        }
+      
+    }).catch(error => {
+        console.error("Error fetching bookings: ", error);
+        setBookings([]);
+    })
   }, []);
 
   return (
