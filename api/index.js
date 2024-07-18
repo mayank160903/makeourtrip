@@ -327,46 +327,95 @@ app.get("/places/:id", async (req, res) => {
   res.json(await Place.findById(id));
 });
 
-app.put("/places", async (req, res) => {
+// app.put("/places", async (req, res) => {
+//     mongoose.connect(process.env.MONGO_URL);
+
+//   const { token } = req.cookies;
+//   const {
+//     id,
+//     title,
+//     address,
+//     addedPhotos,
+//     description,
+//     perks,
+//     addLink,
+//     extraInfo,
+//     checkIn,
+//     checkOut,
+//     maxGuests,
+//     price,
+//   } = req.body;
+//   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
+//     if (err) throw err;
+//     const placeDoc = await Place.findById(id);
+//     if (userData.id === placeDoc.owner.toString()) {
+//       placeDoc.set({
+//         title,
+//         address,
+//         addedPhotos,
+//         description,
+//         perks,
+//         addLink,
+//         extraInfo,
+//         checkIn,
+//         checkOut,
+//         maxGuests,
+//         price,
+//       });
+//       await placeDoc.save();
+//       res.json("ok");
+//     }
+//   });
+// });
+
+app.post("/places", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
-  const { token } = req.cookies;
-  const {
-    id,
-    title,
-    address,
-    addedPhotos,
-    description,
-    perks,
-    addLink,
-    extraInfo,
-    checkIn,
-    checkOut,
-    maxGuests,
-    price,
-  } = req.body;
-  jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    if (err) throw err;
-    const placeDoc = await Place.findById(id);
-    if (userData.id === placeDoc.owner.toString()) {
-      placeDoc.set({
-        title,
-        address,
-        addedPhotos,
-        description,
-        perks,
-        addLink,
-        extraInfo,
-        checkIn,
-        checkOut,
-        maxGuests,
-        price,
-      });
-      await placeDoc.save();
-      res.json("ok");
+    const { token } = req.cookies;
+    if (!token) {
+        return res.status(401).json({ error: "Unauthorized" });
     }
-  });
+
+    jwt.verify(token, jwtSecret, async (err, userData) => {
+        if (err) return res.status(401).json({ error: "Invalid token" });
+
+        const {
+            title,
+            address,
+            addedPhotos,
+            description,
+            perks,
+            addLink,
+            extraInfo,
+            checkIn,
+            checkOut,
+            maxGuests,
+            price,
+        } = req.body;
+
+        try {
+            const placeDoc = await Place.create({
+                owner: userData.id,
+                title,
+                address,
+                addedPhotos,
+                description,
+                perks,
+                addLink,
+                extraInfo,
+                checkIn,
+                checkOut,
+                maxGuests,
+                price,
+            });
+
+            res.json(placeDoc);
+        } catch (error) {
+            res.status(500).json({ error: error.message });
+        }
+    });
 });
+
 
 app.get("/places", async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
@@ -387,27 +436,57 @@ app.get("/places", async (req, res) => {
     res.json(places);
 });
 
+// app.post("/bookings", async (req, res) => {
+//     mongoose.connect(process.env.MONGO_URL);
+
+//     const userData = await req.cookies?.token;
+//   const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
+//     req.body;
+//   Booking.create({
+//     place,
+//     checkIn,
+//     checkOut,
+//     numberOfGuests,
+//     name,
+//     phone,
+//     price,
+//     user: userData.id,
+//   }).then((doc) => {
+//     res.json(doc);
+//   }).catch((err) => {
+//     throw err;
+//   });
+// });
+
 app.post("/bookings", async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
-    const userData = await req.cookies?.token;
-  const { place, checkIn, checkOut, numberOfGuests, name, phone, price } =
-    req.body;
-  Booking.create({
-    place,
-    checkIn,
-    checkOut,
-    numberOfGuests,
-    name,
-    phone,
-    price,
-    user: userData.id,
-  }).then((doc) => {
-    res.json(doc);
-  }).catch((err) => {
-    throw err;
-  });
+    try {
+        const token = req.cookies?.token;
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const userData = jwt.verify(token, jwtSecret);
+        const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
+
+        const booking = await Booking.create({
+            place,
+            checkIn,
+            checkOut,
+            numberOfGuests,
+            name,
+            phone,
+            price,
+            user: userData.id,
+        });
+
+        res.json(booking);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
+
 
 
 
