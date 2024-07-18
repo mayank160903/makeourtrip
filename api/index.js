@@ -273,7 +273,7 @@ app.post("/upload", photosMiddleware.array('photos', 100) ,async (req, res) => {
 //app.post "/bookings"
 //app.get "/bookings"
 
-app.post("/places", (req, res) => {
+app.post("/api/places", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
@@ -311,7 +311,7 @@ app.post("/places", (req, res) => {
   });
 });
 
-app.get("/user-places", (req, res) => {
+app.get("/api/user-places", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
@@ -328,7 +328,7 @@ app.get("/places/:id", async (req, res) => {
   res.json(await Place.findById(id));
 });
 
-app.put("/places", async (req, res) => {
+app.put("/api/places", async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
@@ -388,7 +388,7 @@ app.get("/places", async (req, res) => {
     res.json(places);
 });
 
-app.post("/bookings", async (req, res) => {
+app.post("/api/bookings", async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
     const userData = await getUserDataFromReq(req);
@@ -412,7 +412,7 @@ app.post("/bookings", async (req, res) => {
 
 
 
-app.get('/bookings', async (req, res) => {
+app.get('/api/bookings', async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
     try {
