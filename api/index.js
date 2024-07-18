@@ -74,7 +74,6 @@ async function uploadToS3(path, originalFileName, mimetype) {
 
 function getUserDataFromReq(req) {
     return new Promise((resolve, reject) => {
-    //   const token = req.cookies.token;
     const token = req.headers['authorization'] || req.query.token || req.body.token;
     console.log(token);
       if (!token) {
@@ -416,7 +415,9 @@ app.get('/bookings', async (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
 
     try {
-        const userData = await getUserDataFromReq(req);
+            //   const token = req.cookies.token;
+            // await req.headers['authorization'] || req.query.token || req.body.token;
+        const userData = req.cookies.token;
         const bookings = await Booking.find({ user: userData.id }).populate('place');
         if(bookings){
             res.json(bookings);
