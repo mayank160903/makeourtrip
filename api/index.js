@@ -31,7 +31,7 @@ app.use("/uploads", express.static(__dirname + "/uploads"));
 
 app.use(
   cors({
-    credentials: true,
+    // credentials: true,
     origin: "https://makeourtrip-rho.vercel.app",
   })
 );
@@ -125,7 +125,6 @@ app.post("/register", async (req, res) => {
         otp,
         verified: false,
       });
-      console.log(otp);
       sendVerificationEmail(email, otp);
   
       res.json({ message: "Registration successful. Please check your email for the OTP.", userId: userDoc._id });
