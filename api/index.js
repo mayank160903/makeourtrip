@@ -73,22 +73,20 @@ async function uploadToS3(path, originalFileName, mimetype) {
 }
 
 function getUserDataFromReq(req) {
-  return new Promise((resolve, reject) => {
-      // Check for token in different locations (cookies, headers, body)
-      const token = req.cookies?.token || req.headers['authorization']?.split(" ")[1] || req.query.token || req.body.token;
+    return new Promise((resolve, reject) => {
+    const token = req.headers['authorization'] || req.query.token || req.body.token;
+    console.log(token);
       if (!token) {
-          return reject(new Error('Token not provided'));
+        return reject(new Error('Token not provided'));
       }
-
       jwt.verify(token, jwtSecret, {}, (err, userData) => {
-          if (err) {
-              return reject(err);
-          }
-          resolve(userData);
+        if (err) {
+          return reject(err);
+        }
+        resolve(userData);
       });
-  });
-}
-
+    });
+  }
   
 app.get("/test", (req, res) => {
     mongoose.connect(process.env.MONGO_URL);
@@ -487,50 +485,34 @@ app.get("/places", async (req, res) => {
 //   });
 // });
 
-app.post('/api/bookings', async (req, res) => {
-  mongoose.connect(process.env.MONGO_URL);
-  const userData = await getUserDataFromReq(req);
-  const {
-    place,checkIn,checkOut,numberOfGuests,name,phone,price,
-  } = req.body;
-  Booking.create({
-    place,checkIn,checkOut,numberOfGuests,name,phone,price,
-    user:userData.id,
-  }).then((doc) => {
-    res.json(doc);
-  }).catch((err) => {
-    throw err;
-  });
+app.post("/bookings", async (req, res) => {
+    mongoose.connect(process.env.MONGO_URL);
+
+    try {
+        const token = req.cookies?.token;
+        if (!token) {
+            return res.status(401).json({ error: "Unauthorized" });
+        }
+
+        const userData = jwt.verify(token, jwtSecret);
+        const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
+
+        const booking = await Booking.create({
+            place,
+            checkIn,
+            checkOut,
+            numberOfGuests,
+            name,
+            phone,
+            price,
+            user: userData.id,
+        });
+
+        res.json(booking);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
-
-// app.post("/bookings", async (req, res) => {
-//     mongoose.connect(process.env.MONGO_URL);
-
-//     try {
-//         const token = req.cookies?.token;
-//         if (!token) {
-//             return res.status(401).json({ error: "Unauthorized" });
-//         }
-
-//         const userData = jwt.verify(token, jwtSecret);
-//         const { place, checkIn, checkOut, numberOfGuests, name, phone, price } = req.body;
-
-//         const booking = await Booking.create({
-//             place,
-//             checkIn,
-//             checkOut,
-//             numberOfGuests,
-//             name,
-//             phone,
-//             price,
-//             user: userData.id,
-//         });
-
-//         res.json(booking);
-//     } catch (error) {
-//         res.status(400).json({ error: error.message });
-//     }
-// });
 
 
 
@@ -552,29 +534,23 @@ app.post('/api/bookings', async (req, res) => {
 //     }
 // });
 
-app.get('/api/bookings', async (req,res) => {
-  mongoose.connect(process.env.MONGO_URL);
-  const userData = await getUserDataFromReq(req);
-  res.json( await Booking.find({user:userData.id}).populate('place') );
+app.get('/bookings', async (req, res) => {
+    mongoose.connect(process.env.MONGO_URL);
+
+    try {
+        const token = req.cookies?.token;
+        if (!token) {
+            return res.json("No token bruh");
+        }
+
+        const userData = jwt.verify(token, jwtSecret);
+        const bookings = await Booking.find({ user: userData.id }).populate('place');
+
+        res.json(bookings);
+    } catch (error) {
+        res.status(400).json({ error: error.message });
+    }
 });
-
-// app.get('/bookings', async (req, res) => {
-//     mongoose.connect(process.env.MONGO_URL);
-
-//     try {
-//         const token = req.cookies?.token;
-//         if (!token) {
-//             return res.json("No token bruh");
-//         }
-
-//         const userData = jwt.verify(token, jwtSecret);
-//         const bookings = await Booking.find({ user: userData.id }).populate('place');
-
-//         res.json(bookings);
-//     } catch (error) {
-//         res.status(400).json({ error: error.message });
-//     }
-// });
 
 
 
