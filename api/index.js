@@ -311,21 +311,48 @@ app.post("/places", (req, res) => {
 });
 
 app.get("/user-places", (req, res) => {
-    mongoose.connect(process.env.MONGO_URL);
+  mongoose.connect(process.env.MONGO_URL);
 
   const { token } = req.cookies;
+  
+  // Check if the token exists
+  if (!token) {
+      return res.status(401).json({ error: "Token missing or invalid" });
+  }
+
   jwt.verify(token, jwtSecret, {}, async (err, userData) => {
-    const { id } = userData;
-    res.json(await Place.find({ owner: id }));
+      if (err) {
+          // Handle token verification error
+          return res.status(403).json({ error: "Token is invalid or expired" });
+      }
+
+      const { id } = userData;  // This will now safely destructure
+      try {
+          const places = await Place.find({ owner: id });
+          res.json(places);
+      } catch (error) {
+          // Handle any database errors
+          res.status(500).json({ error: "Database query failed" });
+      }
   });
 });
 
 app.get("/places/:id", async (req, res) => {
-    mongoose.connect(process.env.MONGO_URL);
+  mongoose.connect(process.env.MONGO_URL);
 
   const { id } = req.params;
-  res.json(await Place.findById(id));
+  try {
+      const place = await Place.findById(id);
+      if (!place) {
+          return res.status(404).json({ error: "Place not found" });
+      }
+      res.json(place);
+  } catch (error) {
+      // Handle any database or request errors
+      res.status(500).json({ error: "Database query failed" });
+  }
 });
+
 
 // app.put("/places", async (req, res) => {
 //     mongoose.connect(process.env.MONGO_URL);
